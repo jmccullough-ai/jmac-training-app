@@ -1,6 +1,6 @@
 JMAC TRAINING — STANDALONE PWA WRAPPER v1
 
-PURPOSE
+PURPOSE 
 This wrapper gives the phone app a real web manifest, Apple touch icon,
 maskable Android icon, service worker, standalone display, install button,
 share button, and custom JMAC logo.
