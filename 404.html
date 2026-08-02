@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#312e81">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JMAC Training">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+
+  <title>JMAC Training</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+
+  <style>
+    :root {
+      color-scheme: light;
+      --brand: #312e81;
+      --brand-2: #4338ca;
+      --ink: #111827;
+      --muted: #6b7280;
+      --surface: #ffffff;
+      --line: #d1d5db;
+      --toolbar-h: 54px;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--brand);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    #shell {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: var(--toolbar-h) minmax(0, 1fr);
+      background: #f3f4f6;
+    }
+    #shell.compact {
+      grid-template-rows: 7px minmax(0, 1fr);
+    }
+    #toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      padding: 7px 9px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: white;
+      box-shadow: 0 2px 10px #0003;
+      z-index: 20;
+      transition: transform .18s ease, opacity .18s ease;
+    }
+    #shell.compact #toolbar {
+      transform: translateY(calc(-1 * var(--toolbar-h) + 7px));
+      opacity: .98;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      gap: 8px;
+      margin-right: auto;
+    }
+    .brand img {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      flex: 0 0 auto;
+    }
+    .brand-text {
+      min-width: 0;
+    }
+    .brand-title {
+      margin: 0;
+      font-weight: 800;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brand-status {
+      margin-top: 1px;
+      font-size: 11px;
+      opacity: .82;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .icon-button {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      display: inline-grid;
+      place-items: center;
+      border: 0;
+      border-radius: 9px;
+      background: #ffffff22;
+      color: white;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .icon-button:active { transform: scale(.96); }
+    #frame-wrap {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      background: #ffffff;
+    }
+    #training-frame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #ffffff;
+    }
+    #splash {
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: linear-gradient(145deg, var(--brand), var(--brand-2));
+      color: white;
+      text-align: center;
+      transition: opacity .28s ease, visibility .28s ease;
+    }
+    #splash.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    #splash img {
+      width: min(44vw, 190px);
+      height: auto;
+      border-radius: 28%;
+      box-shadow: 0 18px 45px #0004;
+    }
+    #splash h1 {
+      margin: 18px 0 5px;
+      font-size: 25px;
+    }
+    #splash p {
+      max-width: 360px;
+      margin: 0;
+      opacity: .82;
+      font-size: 14px;
+    }
+    .spinner {
+      width: 34px;
+      height: 34px;
+      margin: 20px auto 0;
+      border: 4px solid #ffffff55;
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #install-card {
+      position: fixed;
+      inset: auto 10px calc(10px + env(safe-area-inset-bottom)) 10px;
+      z-index: 40;
+      display: none;
+      max-width: 520px;
+      margin: auto;
+      padding: 12px;
+      border: 1px solid #c7d2fe;
+      border-radius: 14px;
+      background: white;
+      color: var(--ink);
+      box-shadow: 0 16px 40px #0004;
+    }
+    #install-card.visible { display: block; }
+    #install-card strong { display: block; }
+    #install-card p { margin: 4px 0 10px; color: var(--muted); font-size: 13px; }
+    .install-actions { display: flex; gap: 8px; }
+    .install-actions button {
+      flex: 1;
+      padding: 11px;
+      border: 0;
+      border-radius: 9px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .primary { background: var(--brand-2); color: white; }
+    .secondary { background: #e5e7eb; color: var(--ink); }
+    #ios-help {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      place-items: end center;
+      padding: 16px;
+      background: #0008;
+    }
+    #ios-help.visible { display: grid; }
+    .help-sheet {
+      width: min(100%, 520px);
+      padding: 18px;
+      border-radius: 18px;
+      background: white;
+      color: var(--ink);
+      box-shadow: 0 20px 50px #0006;
+    }
+    .help-sheet h2 { margin: 0 0 10px; }
+    .help-sheet ol { padding-left: 22px; line-height: 1.55; }
+    .help-sheet button {
+      width: 100%;
+      padding: 12px;
+      border: 0;
+      border-radius: 9px;
+      background: var(--brand);
+      color: white;
+      font-weight: 800;
+    }
+    @media (max-width: 520px) {
+      .brand-status { display: none; }
+      .brand-title { font-size: 14px; }
+      #toolbar { gap: 5px; padding-inline: 6px; }
+      .icon-button { width: 36px; height: 36px; min-width: 36px; }
+    }
+    @media (display-mode: standalone) {
+      #install-card { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main id="shell">
+    <header id="toolbar">
+      <div class="brand">
+        <img src="icons/icon-192.png" alt="">
+        <div class="brand-text">
+          <div class="brand-title">JMAC Training</div>
+          <div id="status" class="brand-status">Loading workout app…</div>
+        </div>
+      </div>
+      <button id="share-button" class="icon-button" aria-label="Share app" title="Share">↗</button>
+      <button id="install-button" class="icon-button" aria-label="Install app" title="Install">＋</button>
+      <button id="reload-button" class="icon-button" aria-label="Reload workout app" title="Reload">↻</button>
+      <button id="open-button" class="icon-button" aria-label="Open workout directly" title="Open directly">↗</button>
+      <button id="compact-button" class="icon-button" aria-label="Hide toolbar" title="Hide toolbar">⌃</button>
+    </header>
+
+    <section id="frame-wrap">
+      <iframe
+        id="training-frame"
+        title="JMAC Training App"
+        allow="clipboard-read; clipboard-write"
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
+
+      <div id="splash">
+        <div>
+          <img src="icons/icon-512.png" alt="JMAC Training">
+          <h1>JMAC Training</h1>
+          <p>Opening your workout and training log.</p>
+          <div class="spinner" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <aside id="install-card" role="dialog" aria-label="Install app">
+    <strong>Install JMAC Training</strong>
+    <p>Put the JMAC logo and app on your Home Screen.</p>
+    <div class="install-actions">
+      <button id="install-now" class="primary">Install</button>
+      <button id="install-later" class="secondary">Later</button>
+    </div>
+  </aside>
+
+  <div id="ios-help">
+    <div class="help-sheet">
+      <h2>Add JMAC Training to iPhone</h2>
+      <ol>
+        <li>Open this page in <strong>Safari</strong>.</li>
+        <li>Tap the Safari <strong>Share</strong> button.</li>
+        <li>Choose <strong>Add to Home Screen</strong>.</li>
+        <li>Turn on <strong>Open as Web App</strong>, then tap <strong>Add</strong>.</li>
+      </ol>
+      <button id="close-ios-help">Done</button>
+    </div>
+  </div>
+
+  <script src="app-config.js"></script>
+  <script>
+    (() => {
+      const config = window.JMAC_APP_CONFIG;
+      const shell = document.getElementById('shell');
+      const frame = document.getElementById('training-frame');
+      const splash = document.getElementById('splash');
+      const status = document.getElementById('status');
+      const installCard = document.getElementById('install-card');
+      const iosHelp = document.getElementById('ios-help');
+      let deferredPrompt = null;
+
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isStandalone = () =>
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+
+      function setStatus(message) {
+        status.textContent = message;
+      }
+
+      function loadApp() {
+        setStatus('Loading workout app…');
+        splash.classList.remove('hidden');
+        frame.src = config.appUrl;
+      }
+
+      frame.addEventListener('load', () => {
+        setStatus('Workout app ready');
+        window.setTimeout(() => splash.classList.add('hidden'), 350);
+      });
+
+      window.setTimeout(() => {
+        splash.classList.add('hidden');
+        setStatus('Use Open Directly if sign-in is blocked');
+      }, 8000);
+
+      document.getElementById('reload-button').addEventListener('click', loadApp);
+      document.getElementById('open-button').addEventListener('click', () => {
+        window.open(config.appUrl, '_blank', 'noopener');
+      });
+      document.getElementById('compact-button').addEventListener('click', () => {
+        const compact = shell.classList.toggle('compact');
+        document.getElementById('compact-button').textContent = compact ? '⌄' : '⌃';
+      });
+
+      document.getElementById('share-button').addEventListener('click', async () => {
+        const data = {
+          title: config.appName,
+          text: 'Open the JMAC Training app',
+          url: window.location.href
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(data);
+          } else {
+            await navigator.clipboard.writeText(window.location.href);
+            setStatus('App link copied');
+          }
+        } catch (error) {
+          if (error && error.name !== 'AbortError') setStatus('Share canceled');
+        }
+      });
+
+      window.addEventListener('beforeinstallprompt', event => {
+        event.preventDefault();
+        deferredPrompt = event;
+        if (!isStandalone()) installCard.classList.add('visible');
+      });
+
+      function showInstallHelp() {
+        if (isStandalone()) {
+          setStatus('JMAC Training is already installed');
+          return;
+        }
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.finally(() => {
+            deferredPrompt = null;
+            installCard.classList.remove('visible');
+          });
+        } else if (isIOS) {
+          iosHelp.classList.add('visible');
+        } else {
+          installCard.classList.add('visible');
+          setStatus('Use your browser menu → Install app');
+        }
+      }
+
+      document.getElementById('install-button').addEventListener('click', showInstallHelp);
+      document.getElementById('install-now').addEventListener('click', showInstallHelp);
+      document.getElementById('install-later').addEventListener('click', () => {
+        installCard.classList.remove('visible');
+      });
+      document.getElementById('close-ios-help').addEventListener('click', () => {
+        iosHelp.classList.remove('visible');
+      });
+      iosHelp.addEventListener('click', event => {
+        if (event.target === iosHelp) iosHelp.classList.remove('visible');
+      });
+
+      window.addEventListener('appinstalled', () => {
+        installCard.classList.remove('visible');
+        setStatus('JMAC Training installed');
+      });
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js').catch(() => {
+            setStatus('App loaded; offline shell unavailable');
+          });
+        });
+      }
+
+      loadApp();
+    })();
+  </script>
+</body>
+</html>
