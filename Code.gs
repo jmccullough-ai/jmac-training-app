@@ -103,10 +103,7 @@ function getBootstrap(token) {
     previous: getPreviousPerformance_(session.athlete),
     dashboard: getDashboard_(session.athlete),
     history: getRecentHistory(token, 40),
-    profiles: session.role.toLowerCase() === 'coach' ? listProfiles(token) : [],
-    preferences: {
-      showStopwatch: String(readSetting_('Show Stopwatch') || 'TRUE').toUpperCase() !== 'FALSE'
-    }
+    profiles: session.role.toLowerCase() === 'coach' ? listProfiles(token) : []
   };
 }
 
@@ -406,25 +403,6 @@ function setProfileActive(token, athlete, active) {
   return listProfiles(token);
 }
 
-
-function setCoachPreference(token, key, value) {
-  requireCoach_(token);
-
-  const allowed = {
-    showStopwatch: 'Show Stopwatch'
-  };
-
-  const settingKey = allowed[String(key || '')];
-  if (!settingKey) throw new Error('Unsupported coach preference.');
-
-  const normalized = Boolean(value) ? 'TRUE' : 'FALSE';
-  writeSetting_(settingKey, normalized);
-
-  return {
-    showStopwatch: String(readSetting_('Show Stopwatch') || 'TRUE').toUpperCase() !== 'FALSE'
-  };
-}
-
 function forceRefreshProgram(token) {
   requireCoach_(token);
   syncAllProgramData_();
@@ -450,7 +428,7 @@ function setupStructureOnly_() {
 
 function seedSettings_() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEETS.SETTINGS);
-  const defaults = [['App Title', APP_TITLE], ['Current Week', '1'], ['Default Day', 'Monday'], ['Show Stopwatch', 'TRUE']];
+  const defaults = [['App Title', APP_TITLE], ['Current Week', '1'], ['Default Day', 'Monday']];
   defaults.forEach(([k, v]) => { if (!readSetting_(k)) sheet.appendRow([k, v]); });
 }
 
