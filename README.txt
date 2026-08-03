@@ -1,28 +1,31 @@
-JMAC TRAINING PWA — DIRECT LAUNCH FIX v2
+JMAC TRAINING APP — COACH STOPWATCH PREFERENCE v18
 
-WHY THE SCREEN WAS BLANK
-The Apps Script app was being loaded inside an iframe. On iPhone, Google Workspace
-authentication and cross-site cookie restrictions can block that embedded page,
-leaving a blank white area.
+NEW COACH PREFERENCE
+Coach Admin now includes:
+- Show Floating Stopwatch ON/OFF
 
-THIS BUILD FIXES IT BY
-- Removing the iframe.
-- Opening the Apps Script training app directly in the same window.
-- Preserving the installed JMAC Home Screen icon from the GitHub Pages wrapper.
-- Automatically opening the workout when launched from the installed app.
-- Keeping manual Open Training App, Share, Install, and Copy Link controls.
+WHEN TURNED OFF
+- The floating stopwatch is removed for every user.
+- Any running countdown stops.
+- Auto-start rest timing is disabled.
+- The preference is saved in the Settings tab and remains after reopening the app.
 
-UPDATE GITHUB
-1. Unzip this package.
-2. In the GitHub repository, upload and replace ALL existing files.
-3. Commit with:
-   Direct launch fix v2
-4. Wait for the Pages deployment to finish.
-5. Delete the old JMAC Home Screen app.
-6. Open the GitHub Pages URL in Safari.
-7. Refresh once.
-8. Share > Add to Home Screen > Open as Web App > Add.
-9. Open the new JMAC icon.
+WHEN TURNED ON
+- The floating stopwatch returns for every user.
+- Users can manually start it or use automatic rest timing.
 
-The installed icon belongs to the GitHub Pages wrapper. The wrapper then launches
-the existing Apps Script app directly, avoiding the blank embedded screen.
+UPDATE
+1. Open Extensions > Apps Script.
+2. Replace Code.gs with the included Code.gs.
+3. Replace Index.html with the included Index.html.
+4. Save.
+5. Select setupApp and click Run once.
+   This creates the Show Stopwatch preference in Settings.
+6. Deploy > Manage deployments.
+7. Edit the current deployment.
+8. Choose New version.
+9. Description:
+   JMAC Training App - Coach Stopwatch Preference v18
+10. Deploy.
+11. Sign in as Coach.
+12. Open Coach Admin > Coach Preferences.
